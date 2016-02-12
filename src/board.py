@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pygame
 import random
+import intelligence
 from pygame.locals import *
 from move import *
 EMPTY = 'EMPTY_TILE';
@@ -26,6 +27,7 @@ class Board:
     self.moves = [];
     self.alive = True;
     self.winner = 'NONE';
+    self.previous_score = 0;
 
   # display board for debugging
   def display(self):
@@ -183,7 +185,7 @@ class Board:
 
   # evaluate function for the board
   def evaluate(self):
-    if(is_win(prev,self.other(self.current))):
+    if(self.is_win(self.prev,self.other(self.current))):
       score = -100;
     else :
       ctr1 = 0;
@@ -213,6 +215,7 @@ class Board:
               self.board[i][j] = EMPTY;
           if point1 == point2 and point1 == 1:
             break;
+          i -= 1;
       score = ctr1 - ctr2;
     return score;
 
@@ -270,12 +273,14 @@ class Board:
           print(self.winner);
 
   def next_move(self):
-    available_moves = [];
-    for j in range(7):
-      if self.is_move(j):
-        available_moves.append(j);
-    a = random.choice(available_moves);
-    self.make_move(a);
+    self.previous_score, m = intelligence.getBestMove(self,4,self.previous_score);
+    self.make_move(m);
+    # available_moves = [];
+    # for j in range(7):
+      # if self.is_move(j):
+        # available_moves.append(j);
+    # a = random.choice(available_moves);
+    # self.make_move(a);
 
 
 
