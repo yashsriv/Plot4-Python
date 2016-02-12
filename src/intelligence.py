@@ -2,7 +2,15 @@
 import board
 
 def getBestMove(b, maxdep, prev):
-  return aspiration(b, maxdep, prev);
+  score,mov = aspiration(b, maxdep, prev);
+  b.is_game_over(profile=True);
+  b.is_move(profile=True);
+  b.make_move(profile=True);
+  b.undo_move(profile=True);
+  b.is_win(profile=True);
+  b.find_row(profile=True);
+  b.evaluate(profile=True);
+  return score,mov;
 
 def aspiration(b, maxdep, prev):
   if prev == 0:

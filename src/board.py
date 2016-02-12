@@ -4,6 +4,7 @@ import random
 import intelligence
 from pygame.locals import *
 from move import *
+import time
 EMPTY = 'EMPTY_TILE';
 RED = 'RED_COIN';
 YELLOW = 'YELLOW_COIN';
@@ -13,12 +14,33 @@ blue   = (33 , 150, 243 );
 red    = (244, 67 , 54  );
 yellow = (255, 235, 59  );
 
+def profiler(func):
+  def wrapper(*args, **kwargs):
+    if 'profile' in kwargs:
+      if wrapper.calls == 0:
+        wrapper.calls = -1;
+      print( 'Function = "%s" %d %.6f %.6f' % (func.__name__,wrapper.calls,wrapper.time_taken/wrapper.calls,wrapper.time_taken) );
+      wrapper.calls = 0;
+      wrapper.time_taken = 0;
+      return;
+    wrapper.calls += 1;
+    t1 = time.clock();
+    rvalue = func(*args, **kwargs);
+    t2 = time.clock();
+    wrapper.time_taken += t2 - t1;
+    return rvalue;
+  wrapper.calls = 0;
+  wrapper.time_taken = 0;
+  return wrapper;
+
 
 class Board:
-  # Constructor to initialize stuff
-  # @param void
-  # @return void
   def __init__(self):
+    """
+      Constructor to initialize stuff
+      @param void
+      @return void
+    """
     self.board = [[EMPTY for i in range(7)] for j in range(6)];
     self.old_board = [ l[:] for l in self.board];
     self.prev = Move(-1, -1);
@@ -38,6 +60,7 @@ class Board:
   # if number of moves = 0 , game has not started
   # if last move played by other player was a win, game is over
   #  if total no. of moves = 42, game is over
+  @profiler
   def is_game_over(self):
     if len(self.moves) == 0:
       return False;
@@ -57,10 +80,12 @@ class Board:
       return YELLOW;
 
   # checks if it is a valid move
+  @profiler
   def is_move(self,pos):
     return (pos >= 0 and pos <= 6 and self.board[0][pos] == EMPTY );
 
   # makes a move
+  @profiler
   def make_move(self,pos):
     # self.display();
     for i in range(6):
@@ -76,6 +101,7 @@ class Board:
     self.current = self.other(self.current);
 
   # undo move
+  @profiler
   def undo_move(self):
     m = self.moves.pop();
     self.board[m.row][m.col] = EMPTY;
@@ -85,6 +111,7 @@ class Board:
     self.current = self.other(self.current);
 
   # Finds maximum filled row for faster board evalualtion
+  @profiler
   def find_row(self):
     r = 5;
     i = r;
@@ -99,6 +126,7 @@ class Board:
     return (0);
 
   # check if it is a win
+  @profiler
   def is_win(self,m,k):
     row = m.row;
     col = m.col;
@@ -184,6 +212,7 @@ class Board:
     return False;
 
   # evaluate function for the board
+  @profiler
   def evaluate(self):
     if(self.is_win(self.prev,self.other(self.current))):
       score = -100;
@@ -267,13 +296,15 @@ class Board:
       self.make_move(cord);
       if self.is_game_over():
         print(self.winner);
+        self.alive = False;
       else :
         self.next_move();
         if self.is_game_over():
           print(self.winner);
+          self.alive = False;
 
   def next_move(self):
-    self.previous_score, m = intelligence.getBestMove(self,4,self.previous_score);
+    self.previous_score, m = intelligence.getBestMove(self,7,self.previous_score);
     self.make_move(m);
     # available_moves = [];
     # for j in range(7):

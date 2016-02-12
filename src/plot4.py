@@ -36,7 +36,7 @@ def main():
     pygame.display.update(dirty)
     for i in range(len(dirty)) : dirty.pop()
     fpsClock.tick(FPS)
-  b.draw_full(DISPLAYSURF)
+  b.draw_full_board(DISPLAYSURF)
   # if(b.winner == board.WHITE) :
     # img = pygame.image.load("../res/white_win.png")
   # else :
