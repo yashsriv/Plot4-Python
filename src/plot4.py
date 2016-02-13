@@ -19,19 +19,21 @@ def main():
   pygame.display.update()
   while b.alive :
     for event in pygame.event.get():
-      # print(str(event))
       if event.type == QUIT:
         pygame.quit()
         sys.exit()
       elif event.type == MOUSEBUTTONUP:
         mousex, mousey = event.pos
-        # row = mousey // 80
         col = mousex // 80;
         b.update(col)
       elif event.type == KEYUP:
         if event.key in (K_q,) :
           pygame.quit()
           sys.exit()
+      elif event.type == MOUSEMOTION:
+        mousex, mousey = event.pos
+        col = mousex // 80;
+        b.mouseDisplay(col,DISPLAYSURF,dirty)
     b.draw(DISPLAYSURF,dirty)
     pygame.display.update(dirty)
     for i in range(len(dirty)) : dirty.pop()

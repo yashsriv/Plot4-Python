@@ -50,6 +50,7 @@ class Board:
     self.alive = True;
     self.winner = 'NONE';
     self.previous_score = 0;
+    self.old_mouse_pos = Rect(10, 10, 60, 60);
 
   # display board for debugging
   def display(self):
@@ -114,15 +115,13 @@ class Board:
   @profiler
   def find_row(self):
     r = 5;
-    i = r;
-    while i>=0 :
+    for i in range(r,-1,-1):
       counter = 0;
       for j in range(7):
         if(self.board[i][j] != EMPTY):
           counter += 1;
       if ( counter == 0):
         return i;
-      i -= 1;
     return (0);
 
   # check if it is a win
@@ -136,34 +135,26 @@ class Board:
     horizontal = 1;
     diagonal1 = 1;
     diagonal2 = 1;
-    i = row + 1;
-    while i <= 5:
-      if(self.board[i][col] != k):
-        break;
-      i += 1;
-      vertical += 1;
 
-    i = row - 1;
-    while i >= 0:
+    for i in range(row+1,6):
       if(self.board[i][col] != k):
         break;
-      i -= 1;
+      vertical += 1;
+    for i in range(row - 1, -1, -1):
+      if(self.board[i][col] != k):
+        break;
       vertical += 1;
     if ( vertical >= 4 ):
       return True;
 
 
-    i = col + 1;
-    while i <= 6:
+    for i in range(col + 1, 7):
       if(self.board[row][i] != k):
         break;
-      i += 1;
       horizontal += 1;
-    i = col - 1;
-    while i >= 0:
+    for i in range(col - 1, -1,-1):
       if(self.board[row][i] != k):
         break;
-      i -= 1;
       horizontal += 1;
     if ( horizontal >= 4 ) :
       return True;
@@ -221,8 +212,7 @@ class Board:
       ctr2 = 0;
       row = self.find_row();
       for j in range(7):
-        i = 5;
-        while i>= row:
+        for i in range(5,row - 1,-1):
           point1 = 0;
           point2 = 0;
           flag = False;
@@ -244,7 +234,6 @@ class Board:
               self.board[i][j] = EMPTY;
           if point1 == point2 and point1 == 1:
             break;
-          i -= 1;
       score = ctr1 - ctr2;
     return score;
 
@@ -290,6 +279,15 @@ class Board:
           dirt.append(r);
     self.old_board = [ l[:] for l in self.board];
 
+  def mouseDisplay(self,cord,surface,dirt):
+    if self.current == RED and self.is_move(cord) and self.alive:
+      if self.board[0][((self.old_mouse_pos.topleft[0] - 10)//80)] == EMPTY:
+        pygame.draw.ellipse(surface,(255, 255, 255),self.old_mouse_pos,0);
+        dirt.append(self.old_mouse_pos);
+      r = Rect(10 + (80 * cord), 10, 80 - 20, 80 - 20);
+      pygame.draw.ellipse(surface,red,r,0);
+      dirt.append(r);
+      self.old_mouse_pos = r;
 
   def update(self,cord):
     if self.current == RED and self.is_move(cord) and self.alive:
