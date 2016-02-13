@@ -304,7 +304,7 @@ class Board:
           self.alive = False;
 
   def next_move(self):
-    self.previous_score, m = intelligence.getBestMove(self,7,self.previous_score);
+    self.previous_score, m = intelligence.getBestMove(self,6,self.previous_score);
     self.make_move(m);
     # available_moves = [];
     # for j in range(7):
